@@ -1,0 +1,60 @@
+<script>
+   
+ 
+    $(document).ready(function () {
+        TableManageDefault.init();
+        BalanceSheet();
+
+    });
+    
+    function exportExcel() {
+
+        var qs = '?method=' + $('#Method').val();
+        qs += '&Date=' + $('#start').val();
+      
+
+        window.open('/AccountingReport/_BalanceSheetExcel' + qs, "_top");
+
+    }
+
+
+    function BalanceSheet() {
+        $('#ProgressImg').show();
+        var formData = new FormData();
+     
+        formData.append("Date", $("#start").val());
+
+        $.ajax({
+            type: "POST",
+            url: "/AccountingReport/BalanceSheetJsonList",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                alert(data);
+                $('#ProgressImg').hide();
+                var obj = $.parseJSON(data);
+                var table = $('#myTable').DataTable();
+                table.clear().draw();
+                var msr = 0;
+
+                $.each(obj, function (key, value) {
+
+
+                    msr = msr + 1;
+                    
+
+                    var elmntArray = [
+                        msr,                      
+                        value.LAccountHead, value.Liabilities, value.AAccountHead, value.Assests //names as per database//
+                    ];
+                    table.row.add(elmntArray).draw(false);
+                    
+                    
+                });
+            }
+
+        });
+    }
+
+</script>
